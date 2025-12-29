@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-#server/seed.py
+from random import choice as rc
+from faker import Faker
 
 from app import app
 from models import db, Pet
 
 with app.app_context():
 
-    # Create an empty list
-    pets = []
+    # Initialize Faker
+    fake = Faker()
 
-    # Add some Pet instances to the list
-    pets.append(Pet(name = "Fido", species = "Dog"))
-    pets.append(Pet(name = "Whiskers", species = "Cat"))
-    pets.append(Pet(name = "Hermie", species = "Hamster"))
+    # Delete all rows before seeding
+    Pet.query.delete()
 
-    # Insert each Pet in the list into the database table
+    # List of species
+    species = ['Dog', 'Cat', 'Chicken', 'Hamster', 'Turtle']
+
+    # Generate 10 random pets
+    pets = [Pet(name=fake.first_name(), species=rc(species)) for _ in range(10)]
+
+    # Add all pets to database
     db.session.add_all(pets)
-
-    # Commit the transaction
     db.session.commit()
+
+    print("Database seeded with 10 pets!")
